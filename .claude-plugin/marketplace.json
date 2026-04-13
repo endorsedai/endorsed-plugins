@@ -1,0 +1,16 @@
+{
+  "name": "endorsed-plugins",
+  "owner": {
+    "name": "Endorsed AI",
+    "url": "https://github.com/endorsedai"
+  },
+  "plugins": [
+    {
+      "name": "cold-email-generator",
+      "source": "./plugins/cold-email-generator",
+      "description": "Generates and refreshes cold email copy with spintax formatting for instantly.ai campaigns. Supports 4 proven email types: Personalisation-led, Case Study-led, Bullet Point, and Condensed.",
+      "version": "0.1.0",
+      "keywords": ["cold-email", "outreach", "instantly", "spintax", "sales"]
+    }
+  ]
+}
