@@ -1,0 +1,9 @@
+{
+  "name": "client-brief-generator",
+  "version": "0.1.0",
+  "description": "Generates a standardized Client Email Draft Doc from a client's website, sales deck, and pitch deck. Produces the canonical brief that the cold-email-generator skill consumes. Uses Firecrawl MCP to scrape the client's website. Supports full generation and section-level refresh.",
+  "author": {
+    "name": "Endorsed AI"
+  },
+  "keywords": ["client-onboarding", "brief", "icp", "value-proposition", "cold-email", "sales-enablement"]
+}

@@ -18,21 +18,29 @@ Both modes use `{{RANDOM | option1 | option2 | option3}}` spintax and personaliz
 
 ## Client Context
 
-This skill is designed to work inside a Claude Project that contains client-specific knowledge. Each client has their own project with:
+This skill is designed to work inside a Claude Project that contains client-specific knowledge. The canonical knowledge file is **`client-brief.md`** — produced by the `client-brief-generator` skill.
+
+**Always check for `client-brief.md` first.** If it exists, pull directly from its stable sections:
+
+| Section in client-brief.md | Use for |
+|---|---|
+| `## Value Proposition` | Intro/value prop line — pick the variant matching the campaign angle |
+| `## Case Studies / ROI` | Case study line — pick the variant matching the prospect's likely pain |
+| `## Credibility Lines` | Credibility line — pick the variant matching the email length |
+| `## Personalisation Openers` | Opening line — pick the variant matching the prospect's role/signal |
+| `## Subject Lines` | Subject line options |
+| `## Soft Closes` | Closing CTA |
+| `## ICP & Personas` | Calibrate tone + angle to the target persona |
+
+**If `client-brief.md` is missing**, ask the user to run `/brief-new` first via the `client-brief-generator` skill. Only proceed without it if the user explicitly confirms they want a one-off email using raw deck/website content.
+
+**Fallback sources** (when `client-brief.md` is absent AND user confirms to proceed):
 - Project instructions (client name, ICP, tone, key angles)
 - Website scrape or summary
 - PDFs/decks (pitch decks, case studies, one-pagers)
 - Winning copy examples (optional)
 
-**Always extract from project knowledge:**
-- Company name and what they do (in their own language)
-- Value proposition — the core outcome they deliver
-- Proof points — specific metrics and named case studies
-- Credibility — background, investors, reviews, scale
-- ICP — the target person and their pain points
-- Tone — formal/casual, founder-led/brand-led
-
-**Do NOT fabricate proof points or metrics.** If they're not in the project knowledge, ask the user before proceeding.
+**Do NOT fabricate proof points or metrics.** If they're not in the brief or project knowledge, ask the user before proceeding.
 
 ---
 

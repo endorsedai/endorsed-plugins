@@ -1,7 +1,7 @@
 {
   "name": "cold-email-generator",
-  "version": "0.2.0",
-  "description": "Generates and refreshes cold email copy with spintax formatting for instantly.ai campaigns. Supports 4 proven email types: Personalisation-led, Case Study-led, Bullet Point, and Condensed.",
+  "version": "0.3.0",
+  "description": "Generates and refreshes cold email copy with spintax formatting for instantly.ai campaigns. Supports 4 proven email types: Personalisation-led, Case Study-led, Bullet Point, and Condensed. Pairs with client-brief-generator — when a client-brief.md is present in the Project, pulls value props, case studies, and credibility directly from the brief.",
   "author": {
     "name": "Endorsed AI"
   },

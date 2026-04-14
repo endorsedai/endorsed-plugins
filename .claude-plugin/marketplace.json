@@ -8,9 +8,16 @@
     {
       "name": "cold-email-generator",
       "source": "./plugins/cold-email-generator",
-      "description": "Generates and refreshes cold email copy with spintax formatting for instantly.ai campaigns. Supports 4 proven email types: Personalisation-led, Case Study-led, Bullet Point, and Condensed.",
-      "version": "0.2.0",
+      "description": "Generates and refreshes cold email copy with spintax formatting for instantly.ai campaigns. Supports 4 proven email types: Personalisation-led, Case Study-led, Bullet Point, and Condensed. Pairs with client-brief-generator.",
+      "version": "0.3.0",
       "keywords": ["cold-email", "outreach", "instantly", "spintax", "sales"]
+    },
+    {
+      "name": "client-brief-generator",
+      "source": "./plugins/client-brief-generator",
+      "description": "Generates a standardized Client Email Draft Doc from a client's website, sales deck, and pitch deck. Produces the canonical brief that cold-email-generator consumes. Uses Firecrawl MCP for website scraping. Supports full generation and section-level refresh.",
+      "version": "0.1.0",
+      "keywords": ["client-onboarding", "brief", "icp", "value-proposition", "cold-email", "sales-enablement"]
     }
   ]
 }
