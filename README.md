@@ -6,7 +6,7 @@ Internal marketplace of Claude plugins used at Endorsed AI for cold email copy g
 
 | Name | Version | Description |
 | --- | --- | --- |
-| `client-brief-generator` | 0.1.1 | Generates a standardized Email Draft Doc (`client-brief.md`) from a client's website + sales deck + pitch deck. Run once per new client. |
+| `client-brief-generator` | 0.1.2 | Generates a standardized Email Draft Doc (`client-brief.md`) from a client's website + sales deck + pitch deck. Run once per new client. |
 | `cold-email-generator` | 0.3.0 | Generates and refreshes cold email copy for instantly.ai campaigns. Reads from `client-brief.md` when present. |
 
 The two plugins pair: **`client-brief-generator` produces the menu, `cold-email-generator` assembles the meal.**
@@ -84,8 +84,9 @@ Well under the $5/mo free tier if you're on the Apify free plan. Negligible addi
 
 ### Actors this skill uses
 
-- **`apify/website-content-crawler`** — multi-page crawl for full briefs. Returns LLM-ready markdown.
-- **`apify/rag-web-browser`** — single-page fetch for section refreshes. Faster, cheaper than the crawler.
+- **`apify/rag-web-browser`** — single-page LLM-ready markdown fetcher. Used for both full briefs (6-8 parallel calls, one per key page) and section refreshes (one call).
+
+The skill explicitly avoids `apify/website-content-crawler` because full-site crawls routinely exceed MCP's 60-second synchronous call window, which forces async mode and triggers permission issues. The multi-call pattern with `rag-web-browser` keeps every call under the timeout and parallelizes for speed.
 
 ### Fallback: no Apify
 

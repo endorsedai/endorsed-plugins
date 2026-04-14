@@ -1,7 +1,7 @@
 {
   "name": "client-brief-generator",
-  "version": "0.1.1",
-  "description": "Generates a standardized Client Email Draft Doc from a client's website, sales deck, and pitch deck. Produces the canonical brief that the cold-email-generator skill consumes. Uses Apify MCP (website-content-crawler + rag-web-browser actors) to scrape the client's website. Supports full generation and section-level refresh.",
+  "version": "0.1.2",
+  "description": "Generates a standardized Client Email Draft Doc from a client's website, sales deck, and pitch deck. Produces the canonical brief that the cold-email-generator skill consumes. Uses Apify MCP (rag-web-browser actor, parallel multi-page fetch pattern) to scrape the client's website within MCP's 60s synchronous call window. Supports full generation and section-level refresh.",
   "author": {
     "name": "Endorsed AI"
   },

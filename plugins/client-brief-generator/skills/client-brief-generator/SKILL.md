@@ -25,11 +25,15 @@ This skill requires the **Apify MCP connector** to be configured in Claude.ai Co
 - Remote MCP URL: `https://mcp.apify.com`
 - Auth: OAuth (browser redirect) OR `Authorization: Bearer <APIFY_TOKEN>` header
 - MCP tools exposed: `search-actors`, `call-actor`, `fetch-actor-details`, `add-actor`
-- Actors used by this skill:
-  - **`apify/website-content-crawler`** — multi-page crawl, returns LLM-ready markdown (full brief mode)
-  - **`apify/rag-web-browser`** — single-page fetch (section refresh mode, faster)
+- Actor used by this skill: **`apify/rag-web-browser`**
+  - Fast single-page fetches (~15-22s each) that fit in MCP's 60s synchronous call window
+  - Returns LLM-ready markdown directly
+  - Used for BOTH full brief (multiple targeted calls) AND section refresh (single call)
+  - Enabled by default on Apify MCP, no separate activation needed
 
-Always prefer `crawlerType: "adaptive"` — switches between raw HTTP (cheap, $0.0002/page) and headless browser ($0.005/page) based on whether the site needs JS rendering. For JS-heavy SaaS marketing sites, it'll use the browser. For static sites, raw HTTP.
+**Why not `apify/website-content-crawler`?** It's designed to crawl entire sites and routinely exceeds MCP's 60s timeout, forcing async mode which has separate permissions issues. `rag-web-browser` solves both by being fast-per-call.
+
+Use `scrapingTool: "raw-http"` for static marketing sites (cheaper, ~5s). Use `scrapingTool: "browser-playwright"` for JS-heavy SaaS sites (~15-22s). When in doubt, start with `raw-http` — if markdown comes back empty or obviously broken, retry with `browser-playwright`.
 
 If Apify MCP is not wired up, ask the user to either:
 - Set it up in the Cowork admin, OR
@@ -288,20 +292,33 @@ When generating a new brief:
    - Confirm sales deck and pitch deck are uploaded to the Project
    - If either deck is missing, stop and ask
 
-2. **Scrape the website via Apify**
-   - Invoke `call-actor` with actor `apify/website-content-crawler`
-   - Recommended input:
-     ```json
-     {
-       "startUrls": [{ "url": "https://<client-domain>" }],
-       "maxCrawlPages": 15,
-       "maxCrawlDepth": 2,
-       "crawlerType": "adaptive",
-       "saveMarkdown": true
-     }
-     ```
-   - The actor auto-discovers and crawls homepage, about, product(s), pricing, case studies, customers, and recent blog posts within depth 2
-   - Save the returned markdown into the Project as `website-content.md` for future section refreshes
+2. **Scrape the website via Apify — multi-call pattern**
+
+   Make 6-8 **parallel** `call-actor` invocations against `apify/rag-web-browser`, one per key page. Parallelize them in a single response so total wall-time is ~20s, not 2 minutes.
+
+   Target URL patterns (try each; skip ones that 404):
+   - `https://<client-domain>/` (homepage — always)
+   - `https://<client-domain>/about` or `/about-us`
+   - `https://<client-domain>/product` or `/products` or `/platform`
+   - `https://<client-domain>/pricing`
+   - `https://<client-domain>/customers` or `/case-studies` or `/success-stories`
+   - `https://<client-domain>/blog` (homepage of blog; extract 2-3 recent post URLs from it and fetch those too if valuable)
+
+   Per-call input template:
+   ```json
+   {
+     "query": "https://<client-domain>/<path>",
+     "maxResults": 1,
+     "scrapingTool": "raw-http",
+     "removeCookieWarnings": true
+   }
+   ```
+
+   If a call returns empty/broken markdown (common for JS-heavy SaaS sites), retry that specific URL once with `"scrapingTool": "browser-playwright"`. Don't flip everything to Playwright — it's 4-10x more expensive.
+
+3. **Combine and save**
+   - Concatenate all returned markdown into a single file with clear `## <URL>` separators between pages
+   - Save to the Project as `website-content.md` — used for future section refreshes without re-scraping
 
 3. **Extract structured data from decks**
    - Read sales deck → pull value prop, product descriptions, ROI claims, case study details
@@ -338,7 +355,7 @@ When updating a single section:
 2. **Read the updated source material**
    - New sales deck? Re-extract value prop + case studies + credibility
    - New case study PDF? Slot into the right metric category
-   - Website re-crawl? Use `call-actor` with `apify/rag-web-browser` (single-page, fast) on the changed URL only — do NOT re-crawl the full site
+   - Website re-fetch? Single `call-actor` to `apify/rag-web-browser` with the specific changed URL — do NOT re-scrape the full site
 
 3. **Regenerate ONLY that section**
    - Apply the 4 Hard Rules
@@ -379,6 +396,8 @@ When running Full Brief, save `client-brief.md` to `01-generated/`. Account mana
 **Client's voice, not yours.** Pull phrases verbatim from their website and decks. If they say "revenue operating system" on their homepage, use "revenue operating system" — don't paraphrase to "sales automation platform."
 
 **Numbers beat adjectives.** Every time. If the source material has "significant growth", dig for the actual number in an adjacent slide. If you can't find it, mark it `[NUMBER NEEDED]` in the brief so the account manager can source it — do not invent.
+
+**Batch scrapes in parallel.** When making multiple `rag-web-browser` calls for a single brief, issue them in one response as parallel tool calls. Sequential calls waste time — parallel keeps full-brief generation under 60s wall clock.
 
 **Named clients only.** Never write "our customers" or "leading brands." If the client hasn't publicly named any customer yet, flag this to the account manager as a gap that will hurt copy performance.
 
