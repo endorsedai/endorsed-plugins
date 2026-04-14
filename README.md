@@ -6,7 +6,7 @@ Internal marketplace of Claude plugins used at Endorsed AI for cold email copy g
 
 | Name | Version | Description |
 | --- | --- | --- |
-| `client-brief-generator` | 0.1.0 | Generates a standardized Email Draft Doc (`client-brief.md`) from a client's website + sales deck + pitch deck. Run once per new client. |
+| `client-brief-generator` | 0.1.1 | Generates a standardized Email Draft Doc (`client-brief.md`) from a client's website + sales deck + pitch deck. Run once per new client. |
 | `cold-email-generator` | 0.3.0 | Generates and refreshes cold email copy for instantly.ai campaigns. Reads from `client-brief.md` when present. |
 
 The two plugins pair: **`client-brief-generator` produces the menu, `cold-email-generator` assembles the meal.**
@@ -56,27 +56,40 @@ Configure in the Claude.ai admin console under **Admin Settings → Claude Code 
 
 ---
 
-## Prerequisite: Firecrawl MCP connector (for `client-brief-generator`)
+## Prerequisite: Apify MCP connector (for `client-brief-generator`)
 
-The `client-brief-generator` skill scrapes client websites via Firecrawl. You must set this up **once** in the Cowork admin before using the skill.
+The `client-brief-generator` skill scrapes client websites via Apify. You must set this up **once** in the Cowork admin before using the skill. Endorsed AI is already an Apify customer (used by `endorsedai-ads-intelligence`), so this reuses the existing account — no new vendor, no new billing.
 
 ### Setup steps
 
-1. Create a Firecrawl account at https://firecrawl.dev
-   - Free tier (~500 credits) is enough for initial backfill of all 45 clients
-   - Hobby tier (~$19/mo) if you scale further
-2. Get your API key from the Firecrawl dashboard
-3. In Claude.ai → **Admin → Connectors → Add custom connector**
-4. Configure:
-   - **Name**: Firecrawl
-   - **Remote MCP URL**: `https://mcp.firecrawl.dev/{YOUR_API_KEY}/v2/mcp`
-     (replace `{YOUR_API_KEY}` with your actual Firecrawl key)
-   - **Or** use bearer auth: URL `https://mcp.firecrawl.dev/v2/mcp` + header `Authorization: Bearer YOUR_API_KEY`
-5. Save. Test from a chat: *"use firecrawl_scrape to get the homepage of stripe.com"*
+1. In the Apify console → **Settings → API & Integrations** → copy your personal API token (or generate a shared org token)
+2. In Claude.ai → **Admin → Connectors → Add custom connector**
+3. Configure:
+   - **Name**: Apify
+   - **Remote MCP URL**: `https://mcp.apify.com`
+   - **Auth**: OAuth (browser redirect — recommended) **OR** `Authorization: Bearer <APIFY_TOKEN>` header
+4. Save. Test from a chat: *"search Apify actors for 'website crawler' and list the top 3"*
 
-### Fallback: no Firecrawl
+### Cost estimate for your usage
 
-If Firecrawl is unavailable, account managers can paste the client's website content manually as `website-content.md` into the Project. The skill will use that instead of scraping.
+Apify is true pay-as-you-go via your existing compute units:
+
+| Task | Pages | Approx. cost |
+|---|---|---|
+| One new client brief (full crawl) | ~15 pages | **$0.003-0.08** (adaptive crawler) |
+| All 45 clients backfill | ~675 pages | **$0.15-3.40** one-time |
+| Monthly refresh of 5 clients | ~75 pages | **$0.02-0.40/month** |
+
+Well under the $5/mo free tier if you're on the Apify free plan. Negligible addition to your paid plan.
+
+### Actors this skill uses
+
+- **`apify/website-content-crawler`** — multi-page crawl for full briefs. Returns LLM-ready markdown.
+- **`apify/rag-web-browser`** — single-page fetch for section refreshes. Faster, cheaper than the crawler.
+
+### Fallback: no Apify
+
+If Apify is unavailable, account managers can paste the client's website content manually as `website-content.md` into the Project. The skill will use that instead of scraping.
 
 ---
 
