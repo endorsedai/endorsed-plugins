@@ -6,7 +6,7 @@ Internal marketplace of Claude plugins used at Endorsed AI for cold email copy g
 
 | Name | Version | Description |
 | --- | --- | --- |
-| `client-brief-generator` | 0.1.2 | Generates a standardized Email Draft Doc (`client-brief.md`) from a client's website + sales deck + pitch deck. Run once per new client. |
+| `client-brief-generator` | 0.1.3 | Generates a standardized Email Draft Doc (`client-brief.md`) from whatever client materials are available (website + decks + case studies — all optional). Gaps are flagged in the brief for later refresh. |
 | `cold-email-generator` | 0.3.0 | Generates and refreshes cold email copy for instantly.ai campaigns. Reads from `client-brief.md` when present. |
 
 The two plugins pair: **`client-brief-generator` produces the menu, `cold-email-generator` assembles the meal.**
@@ -99,21 +99,24 @@ If Apify is unavailable, account managers can paste the client's website content
 **Time**: ~20-30 minutes per client.
 
 1. **Create a Claude Project**: "Client: `<Name>` — Outreach"
-2. **Upload materials** to the Project:
-   - Client's sales deck (PDF)
-   - Client's pitch deck (PDF)
-   - Any case study PDFs (optional but recommended)
+2. **Upload whatever materials you have** (all optional — run with what's available):
+   - Client's sales deck (PDF) — strengthens value prop + case studies + credibility
+   - Client's pitch deck (PDF) — strengthens credibility + company snapshot
+   - Case study PDFs — strengthens Case Studies / ROI section
+   - Prior winning emails — strengthens Full Email Examples
 3. **Run `/brief-new`** in the Project chat:
    ```
    /brief-new MEDDICC meddicc.com
    ```
+   The skill scrapes the website, reads whatever docs are uploaded, and produces a brief. Missing materials get flagged with `[GAP — upload X via /brief-refresh Y]` placeholders, not blocked.
 4. **Review the generated `client-brief.md`**
-   - Does every case study name a specific client?
-   - Does every ROI claim have a specific number?
+   - Does every case study that exists name a specific client?
+   - Does every ROI claim that exists have a specific number?
    - Does the tone match how the client actually talks?
-   - Fix any `[NUMBER NEEDED]` placeholders the skill flagged
+   - Note the `[GAP — ...]` markers — these tell you exactly which docs would strengthen the brief
 5. **Save `client-brief.md`** to the Project (or pin it in Project instructions)
-6. Done — the Project is now ready for cold-email-generator campaigns.
+6. **When more materials arrive later**, run `/brief-refresh <Client> <Section>` with the new file uploaded — only that section regenerates
+7. Done — the Project is ready for cold-email-generator campaigns from day one, even with a partial brief.
 
 ### Updating an existing client brief
 

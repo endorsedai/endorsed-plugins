@@ -45,19 +45,45 @@ Never fabricate website content. If neither Apify nor a pasted file is available
 
 ## Input Materials
 
-The skill expects these inputs in the active Claude Project:
+**All inputs are optional.** The skill produces the strongest brief when everything is present, but it runs with whatever's available and annotates gaps for the account manager to close later via section refresh.
 
-| File | Purpose | Required? |
+| File | Purpose | Strengthens which sections |
 |---|---|---|
-| Sales deck (PDF) | Value prop, positioning, ROI claims | Yes |
-| Pitch deck (PDF) | Credibility, team, traction | Yes |
-| Client domain or URL | Website content for tone + positioning | Yes (via Firecrawl) |
-| Case studies (PDF/MD) | Named ROI outcomes | Optional — extract from decks if absent |
-| Prior winning emails (MD) | Voice calibration | Optional |
+| Client domain or URL | Website content for tone + positioning | All sections (primary input) |
+| Sales deck (PDF) | Value prop claims, ROI numbers, positioning | Value Proposition, Case Studies / ROI, Credibility |
+| Pitch deck (PDF) | Team, traction, investors, market positioning | Credibility, Company Snapshot |
+| Case studies (PDF/MD) | Named ROI outcomes | Case Studies / ROI |
+| Prior winning emails (MD) | Voice calibration | Full Email Examples |
 
-If sales deck OR pitch deck is missing, ask the user before proceeding. Do not infer from website alone — decks contain the claims that make copy persuasive.
+**Only block if there is literally zero source material** — no website scrape returned, no decks, no pasted content. In that rare case, ask the user to provide anything at all (even a one-line company description).
+
+Otherwise: run with what's there, fill gaps with `[GAP — <what's needed>]` placeholders so the AM knows exactly what to upload next to strengthen the brief via `/brief-refresh`.
 
 ---
+
+## Graceful Degradation Rules
+
+The brief is a **living document**. It starts as strong as the available materials allow, and gets strengthened as more materials are uploaded and sections are refreshed. Follow these rules:
+
+**When the sales deck is missing:**
+- Draft Value Proposition from website copy (About page, homepage hero, product pages)
+- Mark `## Value Proposition` with a trailing line: `[GAP — upload sales deck via /brief-refresh Value Proposition to strengthen]`
+- Do NOT fabricate ROI claims
+
+**When the pitch deck is missing:**
+- Draft Credibility Lines and Company Snapshot from website (Footer, About, Customers pages) + any public info in the decks/site (investor logos, team bios)
+- Mark `## Credibility Lines` with: `[GAP — upload pitch deck via /brief-refresh Credibility Lines for investor/team detail]`
+
+**When case study materials are missing AND the website names no customers:**
+- Write `## Case Studies / ROI` as: `[GAP — no named case studies found in website or uploaded materials. Upload case study docs via /brief-refresh Case Studies / ROI. This gap will significantly hurt cold email performance.]`
+- Do NOT invent customer names
+
+**When the website returns empty markdown across all pages:**
+- Try retrying each URL with `scrapingTool: "browser-playwright"` once
+- If still empty, ask user to either paste website content or provide any company description
+
+**When literally nothing is available** (no URL, no decks, no content):
+- Stop and ask. This is the only hard block.
 
 ## Mode Decision Tree
 
@@ -287,10 +313,11 @@ Only include formats that fit the client's asset strength. If the client has onl
 
 When generating a new brief:
 
-1. **Confirm inputs**
-   - Ask the user for the client's domain/URL
-   - Confirm sales deck and pitch deck are uploaded to the Project
-   - If either deck is missing, stop and ask
+1. **Inventory inputs** (do NOT block if decks are missing)
+   - Confirm the client's domain/URL from the user's message (required to scrape)
+   - Check the Project for sales deck, pitch deck, case studies, prior winners — list what's present
+   - Announce the inventory in one line: *"Found: website URL, sales deck. Missing: pitch deck, case studies. Proceeding with what's available — will flag gaps for later refresh."*
+   - Only stop and ask if there's literally no source material at all
 
 2. **Scrape the website via Apify — multi-call pattern**
 
@@ -331,10 +358,11 @@ When generating a new brief:
    - Use the client's own language — quote phrases verbatim from their decks where possible
 
 5. **Self-check before output**
-   - Does every case study name a specific client?
-   - Does every ROI claim have a specific number?
-   - Is the value prop under 25 words?
-   - Are credibility lines standalone (work without extra context)?
+   - Every case study that EXISTS names a specific client (never fabricate a name to fill a gap — use the `[GAP — ...]` marker instead)
+   - Every ROI claim that EXISTS has a specific number (same rule: gap-mark rather than invent)
+   - Value prop is under 25 words
+   - Credibility lines are standalone (work without extra context)
+   - Every section with missing source material has an explicit `[GAP — upload X via /brief-refresh Y]` instruction so the AM knows exactly how to close the gap
    - If any answer is no, rewrite that section
 
 6. **Output**

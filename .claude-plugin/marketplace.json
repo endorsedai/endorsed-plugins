@@ -15,8 +15,8 @@
     {
       "name": "client-brief-generator",
       "source": "./plugins/client-brief-generator",
-      "description": "Generates a standardized Client Email Draft Doc from a client's website, sales deck, and pitch deck. Produces the canonical brief that cold-email-generator consumes. Uses Apify MCP (rag-web-browser, parallel multi-page fetch) for website scraping. Supports full generation and section-level refresh.",
-      "version": "0.1.2",
+      "description": "Generates a standardized Client Email Draft Doc from whatever materials are available (all inputs optional). Annotates gaps with [GAP — upload X] placeholders so the brief strengthens over time via section refresh. Uses Apify MCP (rag-web-browser, parallel multi-page fetch).",
+      "version": "0.1.3",
       "keywords": ["client-onboarding", "brief", "icp", "value-proposition", "cold-email", "sales-enablement"]
     }
   ]
