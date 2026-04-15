@@ -1,7 +1,7 @@
 {
   "name": "cold-email-generator",
-  "version": "0.4.0",
-  "description": "Generates and refreshes cold email copy with spintax formatting for instantly.ai campaigns. Supports 4 proven email types (Personalisation-led, Case Study-led, Bullet Point, Condensed) and Sequence 1 + Sequence 2 follow-up generation. Pairs with client-brief-generator: pulls value props, case studies, credibility, sender info, and mailing address from client-brief.md. Parses user input first, asks only for what's missing, never ships placeholder brackets, and outputs each sequence as a separate markdown artifact for easy copy-paste into instantly.ai.",
+  "version": "0.4.1",
+  "description": "Generates cold email copy for instantly.ai campaigns with spintax. Supports 4 email types (Personalisation-led, Case Study-led, Bullet Point, Condensed) and Sequence 1 plus Sequence 2 follow-ups. Reads sender, value props, case studies, credibility, and mailing address from client-brief.md. Parses user input first, asks only for missing inputs, never ships placeholder brackets. Outputs each sequence as a separate markdown artifact for copy-paste into instantly.ai.",
   "author": {
     "name": "Endorsed AI"
   },

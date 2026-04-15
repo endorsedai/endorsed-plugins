@@ -6,8 +6,8 @@ Internal marketplace of Claude plugins used at Endorsed AI for cold email copy g
 
 | Name | Version | Description |
 | --- | --- | --- |
-| `client-brief-generator` | 0.1.4 | Generates a standardized Email Draft Doc (`client-brief.md`) from whatever client materials are available (website, decks, case studies, all optional). Gaps are flagged in the brief for later refresh. |
-| `cold-email-generator` | 0.4.0 | Generates and refreshes cold email copy for instantly.ai campaigns. Supports Sequence 1 + Sequence 2 follow-up. Parses user input first, asks only for what's missing, reads sender/address from `client-brief.md`, outputs each sequence as a separate markdown artifact for easy copy-paste. |
+| `client-brief-generator` | 0.1.5 | Generates a standardized Email Draft Doc (`client-brief.md`) from whatever client materials are available (website, decks, case studies, all optional). Gaps are flagged in the brief for later refresh. |
+| `cold-email-generator` | 0.4.1 | Generates and refreshes cold email copy for instantly.ai campaigns. Supports Sequence 1 + Sequence 2 follow-up. Parses user input first, asks only for what's missing, reads sender/address from `client-brief.md`, outputs each sequence as a separate markdown artifact for easy copy-paste. |
 
 The two plugins pair: **`client-brief-generator` produces the menu, `cold-email-generator` assembles the meal.**
 
