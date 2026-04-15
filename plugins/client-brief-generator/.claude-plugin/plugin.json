@@ -1,6 +1,6 @@
 {
   "name": "client-brief-generator",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Generates a standardized Client Email Draft Doc from whatever client materials are available (website URL, sales deck, pitch deck, case studies; all optional). Produces the canonical brief that cold-email-generator consumes, annotating gaps with explicit [GAP - upload X] placeholders so account managers know what to strengthen via section refresh. Uses Apify MCP (rag-web-browser, parallel multi-page fetch).",
   "author": {
     "name": "Endorsed AI"

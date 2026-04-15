@@ -457,3 +457,84 @@ When running Full Brief, save `client-brief.md` to `01-generated/`. Account mana
 **Named clients only.** Never write "our customers" or "leading brands". If the client hasn't publicly named any customer yet, flag this to the account manager as a gap that will hurt copy performance.
 
 **Account managers review everything.** This skill produces a draft. The AM is responsible for correctness before the brief is used in campaigns.
+
+---
+
+## Passive Feedback Capture (Lean v1)
+
+After generating the brief, observe the conversation for user edit signals. Do not interrupt, confirm, or mention logging mid-session.
+
+### Signals to detect
+
+- "remove / fix / change X"
+- "make it more/less Y"
+- "we don't say Z" / "not our voice"
+- Regeneration of a specific section
+- User pastes back an edited section via `/brief-refresh`
+
+### During session
+
+- Store each detected signal in memory
+- Track chronologically
+- Do not log immediately
+
+### At session end
+
+Session ends when:
+- User says "thanks", "done", "that's it", "good for now"
+- 3+ minutes of inactivity after the last message
+- User starts a different task (e.g., asks about a different client)
+
+When session ends, make ONE GitHub MCP call to create an issue. Use the available GitHub `create_issue` tool (e.g., `endorsedai__create_issue`) against repo `endorsedai/endorsed-plugins`.
+
+**Issue title:**
+```
+[session-log] <client-slug> <YYYY-MM-DD> <AM-first-name>
+```
+
+**Issue labels:**
+```
+type/session-log
+skill/client-brief-generator
+```
+
+**Issue body:**
+```markdown
+## Summary
+- Client: <client>
+- AM: <AM>
+- Skill: client-brief-generator
+- Version: 0.1.6
+- Final output materially changed: <YES/NO>
+
+## Edit Log (chronological)
+<numbered sequence: what was generated, what AM asked, what changed>
+
+## Signals (quick scan)
+- <short phrase per edit signal>
+
+## Possible Patterns (low confidence)
+- <inferred recurring themes, only if obvious; omit section if none>
+```
+
+### Definition of "materially changed"
+
+YES when a section was rewritten, a `[GAP - ...]` placeholder was filled, or tone/structure changed. NO when only typos or single-word swaps.
+
+### Rules
+
+- Never log mid-session
+- Never create more than one issue per session
+- Keep Signals concise (short phrases, not sentences)
+- Only include "Possible Patterns" if a theme is reasonably clear; omit the section otherwise
+- If the user says "don't log this" at any point in the session, skip logging entirely
+- Do not paste full brief content into the log. Summarize what changed; avoid leaking client-specific content unnecessarily
+- AM name: use the name from the MCP OAuth context if available, otherwise leave blank
+
+### Disclosure (show once per Project)
+
+On first generation in a new Project, add this one-line note AFTER the brief output (not before):
+
+> *I log your edit patterns to improve these skills. Logs: github.com/endorsedai/endorsed-plugins/issues?label=type/session-log. Say "don't log this" anytime to skip.*
+
+Do not repeat in subsequent generations in the same Project. Do not repeat across sessions in the same Project.

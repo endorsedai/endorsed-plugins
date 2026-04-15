@@ -6,8 +6,33 @@ Internal marketplace of Claude plugins used at Endorsed AI for cold email copy g
 
 | Name | Version | Description |
 | --- | --- | --- |
-| `client-brief-generator` | 0.1.5 | Generates a standardized Email Draft Doc (`client-brief.md`) from whatever client materials are available (website, decks, case studies, all optional). Gaps are flagged in the brief for later refresh. |
-| `cold-email-generator` | 0.4.1 | Generates and refreshes cold email copy for instantly.ai campaigns. Supports Sequence 1 + Sequence 2 follow-up. Parses user input first, asks only for what's missing, reads sender/address from `client-brief.md`, outputs each sequence as a separate markdown artifact for easy copy-paste. |
+| `client-brief-generator` | 0.1.6 | Generates a standardized Email Draft Doc (`client-brief.md`) from whatever client materials are available. Passively logs AM edit patterns to GitHub Issues for weekly review. |
+| `cold-email-generator` | 0.4.2 | Generates and refreshes cold email copy for instantly.ai campaigns. Supports Sequence 1 + Sequence 2 follow-up. Passively logs AM edit patterns to GitHub Issues for weekly review. |
+
+---
+
+## Feedback loop (Lean v1)
+
+Both skills passively log AM edit patterns to GitHub Issues so the skills improve week over week.
+
+### How it works
+- AMs use skills normally. No extra action.
+- After each session, skill creates ONE issue at `endorsedai/endorsed-plugins` with label `type/session-log`, summarizing what the AM asked to change.
+- AMs are told once per Project that this is happening (with an opt-out).
+
+### Weekly triage (10-15 min)
+
+1. Open: https://github.com/endorsedai/endorsed-plugins/issues?q=is%3Aopen+label%3Atype%2Fsession-log
+2. Read the **Signals** section of each issue (that's the scan layer)
+3. Note recurring patterns across 3+ issues (e.g., "em-dashes keep coming up")
+4. For each pattern worth fixing, create a new issue with label `type/pattern` describing the systemic fix
+5. Close session-log issues after scanning
+
+### When to graduate beyond Lean v1
+
+- If signal quality is strong and volume becomes burdensome (>30 session logs per week): add automated pattern-matching and classification (v2)
+- If signal quality is weak or sparse: rethink capture surface
+- Evaluate after 2-3 weeks of data
 
 The two plugins pair: **`client-brief-generator` produces the menu, `cold-email-generator` assembles the meal.**
 

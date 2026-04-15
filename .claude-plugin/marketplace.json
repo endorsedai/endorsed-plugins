@@ -9,14 +9,14 @@
       "name": "cold-email-generator",
       "source": "./plugins/cold-email-generator",
       "description": "Generates and refreshes cold email copy with spintax formatting for instantly.ai campaigns. Supports 4 proven email types: Personalisation-led, Case Study-led, Bullet Point, and Condensed. Pairs with client-brief-generator.",
-      "version": "0.4.1",
+      "version": "0.4.2",
       "keywords": ["cold-email", "outreach", "instantly", "spintax", "sales", "sequences", "follow-up"]
     },
     {
       "name": "client-brief-generator",
       "source": "./plugins/client-brief-generator",
       "description": "Generates a standardized Client Email Draft Doc from whatever materials are available (all inputs optional). Annotates gaps with [GAP — upload X] placeholders so the brief strengthens over time via section refresh. Uses Apify MCP (rag-web-browser, parallel multi-page fetch).",
-      "version": "0.1.5",
+      "version": "0.1.6",
       "keywords": ["client-onboarding", "brief", "icp", "value-proposition", "cold-email", "sales-enablement"]
     }
   ]
