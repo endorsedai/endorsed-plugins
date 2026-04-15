@@ -9,8 +9,8 @@ description: Generate cold email copy with spintax formatting for instantly.ai c
 
 This skill produces cold email copy for instantly.ai campaigns. There are two modes:
 
-1. **Generate new copy** — build fresh email copy from scratch using one of the 4 proven formats
-2. **Refresh existing copy** — reword and add spintax variations to combat copy fatigue
+1. **Generate new copy**: build fresh email copy from scratch using one of the 4 proven formats
+2. **Refresh existing copy**: reword and add spintax variations to combat copy fatigue
 
 Both modes use `{{RANDOM | option1 | option2 | option3}}` spintax and personalization variables like `{{firstName}}`, `{{companyName}}`.
 
@@ -18,16 +18,16 @@ Both modes use `{{RANDOM | option1 | option2 | option3}}` spintax and personaliz
 
 ## Client Context
 
-This skill is designed to work inside a Claude Project that contains client-specific knowledge. The canonical knowledge file is **`client-brief.md`** — produced by the `client-brief-generator` skill.
+This skill is designed to work inside a Claude Project that contains client-specific knowledge. The canonical knowledge file is **`client-brief.md`**, produced by the `client-brief-generator` skill.
 
 **Always check for `client-brief.md` first.** If it exists, pull directly from its stable sections:
 
 | Section in client-brief.md | Use for |
 |---|---|
-| `## Value Proposition` | Intro/value prop line — pick the variant matching the campaign angle |
-| `## Case Studies / ROI` | Case study line — pick the variant matching the prospect's likely pain |
-| `## Credibility Lines` | Credibility line — pick the variant matching the email length |
-| `## Personalisation Openers` | Opening line — pick the variant matching the prospect's role/signal |
+| `## Value Proposition` | Intro/value prop line. Pick the variant matching the campaign angle. |
+| `## Case Studies / ROI` | Case study line. Pick the variant matching the prospect's likely pain. |
+| `## Credibility Lines` | Credibility line. Pick the variant matching the email length. |
+| `## Personalisation Openers` | Opening line. Pick the variant matching the prospect's role/signal. |
 | `## Subject Lines` | Subject line options |
 | `## Soft Closes` | Closing CTA |
 | `## ICP & Personas` | Calibrate tone + angle to the target persona |
@@ -72,14 +72,14 @@ Reference the prospect's specific role or context at their company. This shows y
 ```
 
 **Line 2 - Intro + Value Proposition**
-One sentence on who you are and what you do. Be succinct and specific — use the client's own language, not generic marketing speak. Name the company and describe the outcome they deliver.
+One sentence on who you are and what you do. Be succinct and specific. Use the client's own language, not generic marketing speak. Name the company and describe the outcome they deliver.
 
 ```
 I'm [Name], [title] of [Company]. [One clear sentence on what you do and who you help.]
 ```
 
 **Line 3 - Case Study / ROI**
-Named client example with specific numbers. This is the most important line — it makes the claim real. Always use actual figures from project knowledge.
+Named client example with specific numbers. This is the most important line. It makes the claim real. Always use actual figures from project knowledge.
 
 ```
 [Case study sentence with client name and specific numerical result.]
@@ -89,11 +89,11 @@ Named client example with specific numbers. This is the most important line — 
 Why should they trust you? Background, investors, scale, reviews, team credentials. Keep it to one sentence.
 
 ```
-[One credibility sentence — team background, notable clients, investors, or scale metric.]
+[One credibility sentence. Team background, notable clients, investors, or scale metric.]
 ```
 
 **Line 5 - Soft Close**
-One simple question. Don't oversell — just invite a conversation.
+One simple question. Don't oversell, just invite a conversation.
 
 ```
 {{RANDOM | Open to a quick chat? | Worth a conversation? | Would you be open to more info or a chat?}}
@@ -133,7 +133,7 @@ Angus
 Same as Type 1.
 
 **Line 2 - Intro + Value Proposition**
-Brief intro. Keep it tight — the case studies are the star.
+Brief intro. Keep it tight. The case studies are the star.
 
 **Line 3 - Multiple Case Studies (bullet format)**
 Lead with "A few recent client results:" then 3-4 bullet points, each with a named company and a specific metric. Vary the type of result (revenue, meetings, pipeline, etc.) to show range.
@@ -279,7 +279,7 @@ Introduction | {{firstName}} <> [SenderName]
 Re: {{companyName}}
 ```
 
-Keep subject lines simple. Don't oversell in the subject line — the goal is just to get the open.
+Keep subject lines simple. Don't oversell in the subject line. The goal is just to get the open.
 
 ---
 
@@ -338,9 +338,9 @@ Aim for 4-8 `{{RANDOM}}` blocks per email. More than that starts to feel forced.
 
 When the user provides existing copy to refresh:
 
-1. **Identify** the current structure — which of the 4 types does it resemble?
+1. **Identify** the current structure. Which of the 4 types does it resemble?
 2. **Preserve** all specific numbers, client names, and personalization variables exactly
-3. **Reword** phrase by phrase — different verbs, sentence structures, transitions
+3. **Reword** phrase by phrase. Different verbs, sentence structures, transitions.
 4. **Add spintax** to greetings, action verbs, connecting phrases, closings, and CTAs
 5. **Output** the full refreshed version, no commentary
 
@@ -365,7 +365,7 @@ When the user provides existing copy to refresh:
 1. Subject line (one line, with spintax if applicable)
 2. Blank line
 3. Email body
-4. No meta-commentary, explanations, or labels — just the email
+4. No meta-commentary, explanations, or labels. Just the email.
 
 ---
 
@@ -381,6 +381,6 @@ When the user provides existing copy to refresh:
 
 **One CTA only.** Pick one soft close and stop. Multiple asks create paralysis.
 
-**No em dashes.** Don't use "—" — it reads as AI-generated. Use a regular dash, comma, or split into a new sentence.
+**No em-dashes or en-dashes.** The characters that look like long dashes read as AI-generated. Use a plain hyphen `-`, comma, colon, or a new sentence instead. Zero exceptions. Apply this to every word of the output: subject line, opener, intro, case study, credibility, CTA, signature.
 
 **No "unsubscribe."** If a compliance/opt-out line is needed, use: `{{RANDOM | Reply with '1' if you do not wish to receive any more emails | Please respond with '1' if you would prefer not to receive further emails | Respond with '1' to opt out of future emails}}`. Only add this if the client requests it.
