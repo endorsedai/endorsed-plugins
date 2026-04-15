@@ -16,6 +16,55 @@ Both modes use `{{RANDOM | option1 | option2 | option3}}` spintax and personaliz
 
 ---
 
+## Required Inputs (pre-flight checklist)
+
+Before generating copy, verify these are available. **If any are missing, STOP and ask the user in plain text.** Never generate copy with placeholder tokens like `[Name]`, `[First name]`, `[Title]`, `[role]`, or any unfilled `[...]` bracket in the final output.
+
+### MUST HAVE (refuse to generate without these)
+
+1. **Sender first name** (e.g., "Angus", "Jane")
+   - **Check first**: the `## Company Snapshot` section of `client-brief.md` for the "Primary sender" field
+   - **If missing or if this campaign uses a different sender**: ask *"Who is sending this email? First name please."*
+
+2. **Sender title** (e.g., "CEO", "founder", "Head of Partnerships")
+   - **Check first**: same source as sender name
+   - **If missing**: ask *"What's the sender's title?"*
+
+3. **Target recipient persona/role** (e.g., "CRO", "VP Sales", "Head of Benefits", "Founder")
+   - **Campaign-specific. Cannot be inferred from client-brief.md.**
+   - Always ask: *"Who is the recipient persona? (e.g., CRO, VP Sales, Head of Benefits, Founder)"*
+
+4. **Email type** (1, 2, 3, or 4)
+   - Default to Type 1 (Personalisation-led) if not specified
+   - Confirm in one line so the AM can override: *"Using Type 1 (Personalisation-led) by default. Want Type 2 (Case Study-led), Type 3 (Bullet Point), or Type 4 (Condensed) instead?"*
+
+### NICE TO HAVE (use smart defaults, don't ask unless volunteered)
+
+- **Specific signal** to lead personalisation (e.g., "they use Competitor X", "just raised Series A"). Default: generic role-based opener from the brief.
+- **Product emphasis** (for multi-product clients). Default: primary value prop from `## Value Proposition` in the brief.
+- **Subject line style, tone, CTA**: inherited from `client-brief.md`.
+
+### Pre-output validation
+
+Before returning the final copy, scan for any of these bracket patterns and refuse to output if found:
+- `[Name]` / `[First name]` / `[Sender]`
+- `[Title]` / `[role]` / `[persona]`
+- Any `[...]` that isn't an explicit spintax variable or personalization token (`{{firstName}}`, `{{companyName}}`, `{{RANDOM | ... }}`)
+
+If any are found: ask the user for the missing value and rewrite before output. Never ship copy with unfilled placeholders.
+
+### Inference shortcuts (to reduce asking)
+
+When the user provides structured input like `/copy-new Fertifa CRO Type 2 Jane COO`, parse it as:
+- `Fertifa` is the client (inferring from Project name is also fine)
+- `CRO` is the target persona
+- `Type 2` is the email type
+- `Jane COO` is the sender name + title
+
+If all 4 required inputs are present in one message, don't ask follow-up questions. Just generate.
+
+---
+
 ## Client Context
 
 This skill is designed to work inside a Claude Project that contains client-specific knowledge. The canonical knowledge file is **`client-brief.md`**, produced by the `client-brief-generator` skill.
