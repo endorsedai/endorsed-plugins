@@ -1,24 +1,30 @@
 ---
-description: Generate new cold email copy for an instantly.ai campaign
-argument-hint: "[client] [persona] [type 1-4] [sender name] [sender title]"
+description: Generate new cold email copy for an instantly.ai campaign. Outputs each sequence as a separate markdown artifact for easy copy-paste.
+argument-hint: "[client] [persona] [type 1-4] [seq1 or seq1+2] [sender name] [sender title]"
 ---
 
-Use the `cold-email-generator` skill to write a new cold email for an instantly.ai campaign.
+Use the `cold-email-generator` skill to write cold email copy for an instantly.ai campaign.
 
 Campaign / client details:
 
 $ARGUMENTS
 
 Requirements:
-- Run the Required Inputs pre-flight checklist FIRST. Before generating, confirm:
-  1. **Sender first name** (from `client-brief.md` Company Snapshot, or ask)
-  2. **Sender title** (same source, or ask)
-  3. **Target recipient persona/role** (always ask, campaign-specific)
-  4. **Email type** (1, 2, 3, or 4; default Type 1, confirm in one line so AM can override)
-- If the user provided structured input like `Fertifa CRO Type 2 Jane COO`, parse it and skip asking.
-- If any of the 4 required inputs are missing, STOP and ask the user in plain text. Never fill with `[Name]`, `[Title]`, `[role]` placeholders.
-- Use spintax on greetings, action verbs, and closings (aim for 4-8 `{{RANDOM}}` blocks).
+- **Parse `$ARGUMENTS` first**. Extract any of these the user already provided: client, persona, email type, sequence depth, sender name, sender title. Do NOT re-ask for anything already given.
+- **Check `client-brief.md`** for sender name, sender title, client name, mailing address (if Sequence 2 needed).
+- **Ask ONLY for what's still missing**:
+  1. Sender first name (if not in message or brief)
+  2. Sender title (if not in message or brief)
+  3. Target recipient persona (if not in message)
+  4. Email type (default Type 1, confirm in one line)
+  5. Sequence depth (default 1; "Sequence 1 only, or Sequence 1 + Sequence 2 follow-up?")
+  6. Mailing address (only if Sequence 2 requested and not in brief)
+- **Never ship placeholder brackets**: `[Name]`, `[Title]`, `[role]`, `[First name]`, `[Address]`, `[Sender full name]`, etc. Scan the final copy for any `[...]` that isn't a `{{...}}` variable. If any found, ask for the missing value and rewrite.
+- **Output as separate markdown artifacts**:
+  - One artifact per sequence (artifact per email, not one combined artifact)
+  - Sequence 1: subject line + blank line + body
+  - Sequence 2: body only (no subject, continues thread) + signature block + compliance line
+  - No commentary, no "here's your email" prose, just the artifacts
+- Use spintax on greetings, action verbs, and closings (aim for 4-8 `{{RANDOM}}` blocks in Sequence 1).
 - Include personalization variables: `{{firstName}}`, `{{companyName}}`.
-- Output: subject line, blank line, email body. No commentary, no labels.
-- Pull client-specific facts (value prop, proof points, credibility) from project knowledge. Do not invent metrics.
-- Pre-output validation: scan final copy for any `[...]` brackets that aren't `{{...}}` variables. If any found, rewrite with the missing values before output.
+- Pull client-specific facts (value prop, proof points, credibility) from project knowledge. Never invent metrics.

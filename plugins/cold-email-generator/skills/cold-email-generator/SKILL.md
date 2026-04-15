@@ -18,50 +18,53 @@ Both modes use `{{RANDOM | option1 | option2 | option3}}` spintax and personaliz
 
 ## Required Inputs (pre-flight checklist)
 
-Before generating copy, verify these are available. **If any are missing, STOP and ask the user in plain text.** Never generate copy with placeholder tokens like `[Name]`, `[First name]`, `[Title]`, `[role]`, or any unfilled `[...]` bracket in the final output.
+Before generating copy, resolve these 5 inputs in this order. **Only ask for what's still missing after steps 1 and 2.**
 
-### MUST HAVE (refuse to generate without these)
+### Step 1: Parse the user's message first
 
-1. **Sender first name** (e.g., "Angus", "Jane")
-   - **Check first**: the `## Company Snapshot` section of `client-brief.md` for the "Primary sender" field
-   - **If missing or if this campaign uses a different sender**: ask *"Who is sending this email? First name please."*
+Read the user's input carefully. Extract any of these that were already provided:
+- Client name (or infer from the Project name)
+- Target persona / recipient role
+- Email type (1, 2, 3, or 4)
+- Sender first name
+- Sender title
+- Sequence depth (just 1, or 1+2)
 
-2. **Sender title** (e.g., "CEO", "founder", "Head of Partnerships")
-   - **Check first**: same source as sender name
-   - **If missing**: ask *"What's the sender's title?"*
+Do NOT re-ask for anything the user already said. If they typed "write a cold email to a CRO at Linear", the persona is `CRO`. Don't ask again.
 
-3. **Target recipient persona/role** (e.g., "CRO", "VP Sales", "Head of Benefits", "Founder")
-   - **Campaign-specific. Cannot be inferred from client-brief.md.**
-   - Always ask: *"Who is the recipient persona? (e.g., CRO, VP Sales, Head of Benefits, Founder)"*
+### Step 2: Check `client-brief.md`
 
-4. **Email type** (1, 2, 3, or 4)
-   - Default to Type 1 (Personalisation-led) if not specified
-   - Confirm in one line so the AM can override: *"Using Type 1 (Personalisation-led) by default. Want Type 2 (Case Study-led), Type 3 (Bullet Point), or Type 4 (Condensed) instead?"*
+Pull whatever's still missing from the brief's `## Company Snapshot`:
+- Sender first name (from "Primary sender" field)
+- Sender title (same field)
+- Client name (from title of the brief)
+- Mailing address (if Sequence 2 is requested)
 
-### NICE TO HAVE (use smart defaults, don't ask unless volunteered)
+### Step 3: Ask ONLY for what's still missing
 
-- **Specific signal** to lead personalisation (e.g., "they use Competitor X", "just raised Series A"). Default: generic role-based opener from the brief.
-- **Product emphasis** (for multi-product clients). Default: primary value prop from `## Value Proposition` in the brief.
-- **Subject line style, tone, CTA**: inherited from `client-brief.md`.
+Required (refuse to generate without):
+
+1. **Sender first name** - only ask if missing from both user's message and brief
+2. **Sender title** - only ask if missing from both user's message and brief
+3. **Target recipient persona** - ask if missing (campaign-specific, rarely in brief)
+4. **Email type** - default Type 1, confirm in one line: *"Using Type 1 (Personalisation-led) by default. Want Type 2 (Case Study-led), Type 3 (Bullet Point), or Type 4 (Condensed) instead?"*
+5. **Sequence depth** - ask: *"Generate Sequence 1 only, or Sequence 1 + Sequence 2 follow-up? (Default: just 1)"*
+
+If Sequence 2 is requested AND mailing address is not in the brief, ask for it in the same message: *"Sequence 2 needs the company mailing address for the signature block. What's the address?"*
 
 ### Pre-output validation
 
-Before returning the final copy, scan for any of these bracket patterns and refuse to output if found:
-- `[Name]` / `[First name]` / `[Sender]`
+Before returning the final copy, scan for any bracket patterns and refuse to output if found:
+- `[Name]` / `[First name]` / `[Sender]` / `[Full name]`
 - `[Title]` / `[role]` / `[persona]`
+- `[Address]` / `[Mailing address]`
 - Any `[...]` that isn't an explicit spintax variable or personalization token (`{{firstName}}`, `{{companyName}}`, `{{RANDOM | ... }}`)
 
-If any are found: ask the user for the missing value and rewrite before output. Never ship copy with unfilled placeholders.
+If any are found, ask the user for the missing value and rewrite before output.
 
-### Inference shortcuts (to reduce asking)
+### Inference shortcut
 
-When the user provides structured input like `/copy-new Fertifa CRO Type 2 Jane COO`, parse it as:
-- `Fertifa` is the client (inferring from Project name is also fine)
-- `CRO` is the target persona
-- `Type 2` is the email type
-- `Jane COO` is the sender name + title
-
-If all 4 required inputs are present in one message, don't ask follow-up questions. Just generate.
+If the user provides structured input like `/copy-new Fertifa CRO Type 2 seq1+2 Jane "Head of Partnerships"`, parse all inputs and skip asking entirely.
 
 ---
 
@@ -409,12 +412,82 @@ When the user provides existing copy to refresh:
 
 ---
 
+## Sequence 2: Follow-up Email
+
+Sequence 2 is a short follow-up sent a few days after Sequence 1. It continues the same thread (no new subject line) and references the previous email. Keep it tight: one greeting + one follow-up prompt + sign-off + signature block + compliance line.
+
+### Structure
+
+1. Greeting (short spintax: Hey | Hi)
+2. One-line follow-up prompt (5-variant spintax on "did you see the previous email")
+3. Combined question (4-variant spintax on "worth a chat?")
+4. Sign-off (3-variant spintax: Thanks | Cheers | Best)
+5. Sender first name
+6. Blank line, `--` separator, blank line
+7. Full signature block:
+   - Sender full name
+   - Title (with spintax variants if provided, e.g., "CEO & Founder | Founder & CEO")
+   - Client name (pipe-separated from title)
+   - Mailing address (line below)
+8. Compliance line: `Please respond with 'unsub' if you do not wish to receive any more emails`
+
+### Template (Endorsed AI example, adapt content per client)
+
+```
+{{RANDOM | Hey | Hi}} {{firstName}},
+
+{{RANDOM | Had a chance to review | Did you get a chance to look over | Were you able to review | Just checking if you had time to review | Wanted to see if you'd had a chance to look at}} the {{RANDOM | below | info below}} and {{RANDOM | worth a chat? | worth a quick chat? | open to a quick chat? | worth discussing?}}
+
+{{RANDOM | Thanks | Cheers | Best}},
+[Sender first name]
+
+--
+[Sender full name]
+{{RANDOM | [Title variant 1] | [Title variant 2]}} | [Client name]
+[Client mailing address]
+
+Please respond with 'unsub' if you do not wish to receive any more emails
+```
+
+Always produce the sign-off name and signature block with actual values. Never ship `[Sender first name]`, `[Sender full name]`, `[Title variant]`, `[Client name]`, or `[Client mailing address]` placeholders in the final output.
+
+### Title variant generation
+
+When the user provides one title (e.g., "CEO & Founder"), generate a second natural variant for spintax (e.g., "Founder & CEO"). If the user provides two explicitly, use both. If the title has no natural reversal (e.g., "Head of Sales"), use it once without spintax on that position.
+
+### No subject line in Sequence 2
+
+Sequence 2 continues the Sequence 1 thread in instantly.ai. Do not output a subject line for Sequence 2.
+
+---
+
 ## Output Format
 
-1. Subject line (one line, with spintax if applicable)
-2. Blank line
-3. Email body
-4. No meta-commentary, explanations, or labels. Just the email.
+Output email copy as **separate markdown artifacts in claude.ai**, one per sequence. This lets AMs copy each sequence directly into instantly.ai without parsing through prose.
+
+### Per-sequence artifact format
+
+For each sequence, create a dedicated artifact:
+
+- **Artifact identifier**: `sequence-1-<client>` or `sequence-2-<client>` (lowercase, hyphenated)
+- **Artifact title**: `Sequence 1 - <Client> - <Persona>` or `Sequence 2 - <Client>`
+- **Content type**: `text/markdown`
+- **Content structure**:
+  - Sequence 1: subject line, blank line, email body (including sign-off)
+  - Sequence 2: email body only (no subject line), including signature block and compliance line
+  - No commentary, no labels like "Here's the email:", no explanations
+
+### Ordering when generating multiple sequences
+
+1. Sequence 1 first (its own artifact)
+2. Sequence 2 second (its own artifact, only if the AM requested Sequence 1 + Sequence 2)
+3. Never combine into one artifact. Separate artifacts make copy-paste into instantly.ai trivial.
+
+### What NOT to include
+
+- No meta-commentary ("Here's your email:", "Let me know if you want changes")
+- No explanations of which type was used (that's implied by the artifact title)
+- No prose before or after the artifacts
 
 ---
 
